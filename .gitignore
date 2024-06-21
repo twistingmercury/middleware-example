@@ -1,0 +1,57 @@
+# Binaries
+[Bb]in/
+_[Bb]in/
+
+# Environment files
+**/*.env
+
+# Output files
+**/*.out
+
+# Mac OS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+*.exe
+*.dll
+
+# VS Code
+.vscode/
+.history/
+*.vsix
+
+# JetBrains
+out/
+.idea/
+
+# Virtual Environment
+venv/
