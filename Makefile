@@ -1,8 +1,8 @@
-default: run
+default: img
 
 .PHONY:img
 img:
-	docker build --force-rm . -t example/exapp:latest
+	docker build --file server/Dockerfile ./server -t example/server:latest
 	docker system prune -f
 
 

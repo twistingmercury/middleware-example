@@ -47,7 +47,7 @@ services:
     ports:
       - "9090:9090"
     volumes:
-      - "./prometheus.yaml:/etc/prometheus/prometheus.yml:ro"
+      - "./configs/prometheus.yaml:/etc/prometheus/prometheus.yml:ro"
     networks:
       - mw_net
 
