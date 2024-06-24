@@ -6,14 +6,13 @@ COPY ../.. .
 
 RUN apk add --no-cache git
 RUN go mod tidy
-RUN go build -ldflags "-s -w" -o ./bin/server ./server.go
-
+RUN go build -ldflags "-s -w" -o ./bin/client ./client.go
 
 FROM scratch as final
 
 WORKDIR /app
 COPY --from=build /src/bin/ /app/
 
-EXPOSE 8080 9091
+EXPOSE 9092
 
-ENTRYPOINT ["/app/server"]
+ENTRYPOINT ["/app/client"]
