@@ -12,6 +12,7 @@ import (
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
 	"go.opentelemetry.io/otel/trace"
 	"log"
+	"math/rand"
 	"net/http"
 	"os"
 	"time"
@@ -68,8 +69,20 @@ func main() {
 }
 
 func epochTime(context context.Context) int64 {
-	_, span := tracing.Start(context, "epochTime", trace.SpanKindInternal)
+	cCtx, span := tracing.Start(context, "epochTime", trace.SpanKindInternal)
+	time.Sleep(time.Duration(randomInt(cCtx)) * time.Millisecond)
 	defer span.End()
 	span.SetStatus(codes.Ok, "")
 	return time.Now().Unix()
+}
+
+func randomInt(pCtx context.Context) int {
+	_, span := tracing.Start(pCtx, "randomize", trace.SpanKindInternal)
+	defer func() {
+		span.SetStatus(codes.Ok, "ok")
+		span.End()
+	}()
+	low := 500
+	high := 5000
+	return rand.Intn(high-low+1) + low
 }

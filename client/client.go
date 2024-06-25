@@ -18,6 +18,7 @@ import (
 	"math/rand"
 	"net/http"
 	"os"
+	"strconv"
 	"sync"
 	"time"
 )
@@ -31,24 +32,23 @@ const (
 
 var (
 	mtx          sync.Mutex
-	routines     = flag.Int("goroutines", 3, "number of goroutines, default is 3")
 	totalCalls   *prometheus.CounterVec
 	callDuration *prometheus.HistogramVec
 )
 
 func init() {
-	labels := []string{"path", "status_code", "is_error"}
+	labels := []string{"goroutine_ID", "status_code", "is_error"}
 	totalCalls = prometheus.NewCounterVec(prometheus.CounterOpts{
 		Namespace: namespace,
-		Name:      fmt.Sprintf("%s_%s_total_api_calls", namespace, serviceName),
-		Help:      "The count of all call to the API, grouped by path, http method, and status code"},
+		Name:      fmt.Sprintf("%s_total_api_calls", serviceName),
+		Help:      "The count of all call to the API, grouped by the go routine ID, status code, and if the call was successful"},
 		labels)
 
 	callDuration = prometheus.NewHistogramVec(prometheus.HistogramOpts{
 		Namespace: namespace,
-		Name:      fmt.Sprintf("%s_%s_call_api_call_duration", namespace, serviceName),
-		Help:      "The duration in milliseconds calls to the API, grouped by path, http method, and status code",
-		Buckets:   prometheus.ExponentialBuckets(0.1, 1.5, 5)},
+		Name:      fmt.Sprintf("%s_call_api_call_duration", serviceName),
+		Help:      "The duration in milliseconds calls to the API, grouped by the go routine ID, status code, and if the call was successful",
+		Buckets:   prometheus.ExponentialBuckets(0.1, 2, 5)},
 		labels)
 }
 
@@ -83,15 +83,16 @@ func main() {
 		logging.Fatal(err, "failed to initialize client tracing")
 	}
 
-	for i := 0; i < *routines; i++ {
-		go callEpochAPI(ctx)
+	for i := 0; i < 10; i++ {
+		go callEpochAPI(i, ctx)
 	}
 	logging.Info("client has started.")
 	<-ctx.Done()
 }
 
-func callEpochAPI(context context.Context) {
+func callEpochAPI(routineID int, context context.Context) {
 	var ctx = context
+	rID := strconv.Itoa(routineID)
 	for {
 		select {
 		case <-ctx.Done():
@@ -104,11 +105,10 @@ func callEpochAPI(context context.Context) {
 				pCtx, span := tracing.Start(ctx, "callEpochAPI", trace.SpanKindClient)
 				defer func() {
 					span.End()
-					path := "server:8080/epoch"
 					isErr := fmt.Sprintf("%v", err != nil)
 					elapsed := float64(duration.Milliseconds())
-					totalCalls.WithLabelValues(path, statusCode, isErr).Inc()
-					callDuration.WithLabelValues(path, statusCode, isErr).Observe(elapsed)
+					totalCalls.WithLabelValues(rID, statusCode, isErr).Inc()
+					callDuration.WithLabelValues(rID, statusCode, isErr).Observe(elapsed)
 				}()
 
 				req, err := http.NewRequestWithContext(pCtx, "GET", "http://server:8080/epoch", nil)
@@ -122,7 +122,7 @@ func callEpochAPI(context context.Context) {
 
 				client := &http.Client{
 					Transport: otelhttp.NewTransport(http.DefaultTransport),
-					Timeout:   time.Millisecond * 500,
+					Timeout:   time.Millisecond * 5000,
 				}
 
 				start := time.Now()

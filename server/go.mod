@@ -5,7 +5,7 @@ go 1.22.3
 require (
 	github.com/gin-gonic/gin v1.10.0
 	github.com/rs/zerolog v1.33.0
-	github.com/twistingmercury/middleware v1.0.1
+	github.com/twistingmercury/middleware v1.0.2
 	github.com/twistingmercury/telemetry v1.0.3
 	go.opentelemetry.io/otel v1.27.0
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.27.0
