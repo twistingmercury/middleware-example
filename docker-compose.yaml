@@ -3,8 +3,6 @@ networks:
     driver: bridge
 
 volumes:
-#  prometheus-data:
-#    driver: local
   grafana-data:
     driver: local
 
@@ -17,6 +15,8 @@ services:
       - "9092:9092"
     environment:
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4317
+      - LOG_LEVEL=2
+      - CONCURRENCY=10
     networks:
       - mw_net
     depends_on:
@@ -32,6 +32,7 @@ services:
       - "9091:9091"
     environment:
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4317
+      - LOG_LEVEL=2
     networks:
       - mw_net
     depends_on:

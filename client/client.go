@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"flag"
 	"fmt"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/rs/zerolog"
@@ -56,10 +55,20 @@ func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	utils.ListenForInterrupt(cancel)
-	flag.Parse()
+
+	loglevel, err := strconv.Atoi(os.Getenv("LOG_LEVEL"))
+	if err != nil {
+		loglevel = 2
+	}
+
+	routines, err := strconv.Atoi(os.Getenv("CONCURRENCY "))
+
+	if err != nil {
+		routines = 10
+	}
 
 	// 1.Initialize the logging package.
-	if err := logging.Initialize(zerolog.WarnLevel, os.Stdout, serviceName, serviceVersion, environment); err != nil {
+	if err := logging.Initialize(zerolog.Level(loglevel), os.Stdout, serviceName, serviceVersion, environment); err != nil {
 		log.Panicf("failed to initialize client logging: %v", err)
 	}
 
@@ -83,7 +92,7 @@ func main() {
 		logging.Fatal(err, "failed to initialize client tracing")
 	}
 
-	for i := 0; i < 10; i++ {
+	for i := 0; i < routines; i++ {
 		go callEpochAPI(i, ctx)
 	}
 	logging.Info("client has started.")

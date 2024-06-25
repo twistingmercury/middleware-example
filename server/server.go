@@ -28,8 +28,17 @@ const (
 func main() {
 	ctx := context.Background()
 
+	var loglevel zerolog.Level
+	envLvl := os.Getenv("LOG_LEVEL")
+
+	if envLvl == "" {
+		loglevel = 3
+	} else {
+		loglevel, _ = zerolog.ParseLevel(envLvl)
+	}
+
 	// 1.Initialize the logging package.
-	if err := logging.Initialize(zerolog.WarnLevel, os.Stdout, serviceName, serviceVersion, environment); err != nil {
+	if err := logging.Initialize(loglevel, os.Stdout, serviceName, serviceVersion, environment); err != nil {
 		log.Panicf("failed to initialize logging: %v", err)
 	}
 	// 2. Initialize the metrics package.
