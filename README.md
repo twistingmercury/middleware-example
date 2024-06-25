@@ -36,8 +36,12 @@ This example uses Jaeger for tracing, and Grafana for visualizing the metrics. Y
 * Simply execute `make` from the root directory. The solution will then build and containerize the server and the client, invoke the `docker compose up` command lauching the example.
 * From there, to see the traces open [jaeger](http://localhost:16686). You should see something similar to this:
 
-   ![image](assets/Screenshot%202024-06-25%20at%2012.27.35.png)
+   ![image](assets/metrics.png)
 
-* To see the metrics, open [grafana](http://localhost:3000/explore/metrics/trail?from=now-1h&to=now&var-ds=P1809F7CD0C75ACF3&var-filters=&refresh=5s)
-  * You'll need to log in. The user name and the password are both `admin`.
-  * You'll be asked to change the password. You can skip this.
+* To see the metrics, open [grafana](http://localhost:3000/explore/metrics/trail?from=now-1h&to=now&var-ds=P1809F7CD0C75ACF3&var-filters=&refresh=5s). 
+  * You'll need to log in. The user name and the password are both `admin`. 
+  * You'll be asked to change the password. You can skip this. 
+
+* You should see something similar to this:
+
+   ![image](assets/traces.png)
